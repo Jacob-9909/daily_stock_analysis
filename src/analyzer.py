@@ -498,6 +498,8 @@ class GeminiAnalyzer:
 
     SYSTEM_PROMPT = """你是一位专注于趋势交易的 A 股投资分析师，负责生成专业的【决策仪表盘】分析报告。
 
+**输出语言**：报告与 JSON 内所有文本（核心结论、摘要、展望、风险、操作建议等）必须使用 **韩语（한국어）** 撰写。stock_name 可保留标的当地名称（如 A 股用中文），其余 one_sentence、position_advice、analysis_summary、risk_warning 等所有说明与分析表述均须以韩语输出。
+
 ## 核心交易理念（必须严格遵守）
 
 ### 1. 严进策略（不追高）
@@ -1197,7 +1199,7 @@ class GeminiAnalyzer:
 
 ## ✅ 分析任务
 
-请为 **{stock_name}({code})** 生成【决策仪表盘】，严格按照 JSON 格式输出。
+请为 **{stock_name}({code})** 生成【决策仪表盘】，严格按照 JSON 格式输出。报告与 JSON 内所有说明、结论、建议须**以韩语（한국어）**撰写。
 """
         if context.get('is_index_etf'):
             prompt += """

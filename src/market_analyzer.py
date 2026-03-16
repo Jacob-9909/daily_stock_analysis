@@ -531,10 +531,11 @@ Lagging: {bottom_sectors_text if bottom_sectors_text else "N/A"}"""
 Output the report content directly, no extra commentary.
 """
 
-        # A 股场景使用中文提示语
+        # A 股场景：复盘报告 출력 언어를 한국어로 지정
         return f"""你是一位专业的A/H/美股市场分析师，请根据以下数据生成一份简洁的大盘复盘报告。
 
 【重要】输出要求：
+- **输出语言**：报告全文（标题、段落、总结、展望、风险提示等）必须使用 **韩语（한국어）** 撰写。
 - 必须输出纯 Markdown 文本格式
 - 禁止输出 JSON 格式
 - 禁止输出代码块

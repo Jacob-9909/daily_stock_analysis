@@ -591,8 +591,8 @@ class StockAnalysisPipeline:
             if trend_result:
                 initial_context["trend_result"] = self._safe_to_dict(trend_result)
 
-            # 运行 Agent
-            message = f"请分析股票 {code} ({stock_name})，并生成决策仪表盘报告。"
+            # 运行 Agent（요청 메시지에 한국어 출력 명시）
+            message = f"다음 종목을 분석하고 의사결정 대시보드 보고서를 **한국어**로 생성해 주세요: {code} ({stock_name})."
             agent_result = executor.run(message, context=initial_context)
 
             # 转换为 AnalysisResult
