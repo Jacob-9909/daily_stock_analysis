@@ -1,16 +1,16 @@
-{# Shared macros for report templates #}
+{# Shared macros for report templates (한국어) #}
 {% macro market_snapshot(result) %}
 {% set snapshot = result.market_snapshot if result.market_snapshot else {} %}
 {% if snapshot %}
-### 📈 当日行情
+### 📈 당일 시세
 
-| 收盘 | 昨收 | 开盘 | 最高 | 最低 | 涨跌幅 | 涨跌额 | 振幅 | 成交量 | 成交额 |
-|------|------|------|------|------|-------|-------|------|--------|--------|
+| 종가 | 전일종가 | 시가 | 고가 | 저가 | 등락률 | 등락폭 | 등폭 | 거래량 | 거래대금 |
+|------|----------|------|------|------|--------|--------|------|--------|----------|
 | {{ snapshot.get('close', 'N/A') }} | {{ snapshot.get('prev_close', 'N/A') }} | {{ snapshot.get('open', 'N/A') }} | {{ snapshot.get('high', 'N/A') }} | {{ snapshot.get('low', 'N/A') }} | {{ snapshot.get('pct_chg', 'N/A') }} | {{ snapshot.get('change_amount', 'N/A') }} | {{ snapshot.get('amplitude', 'N/A') }} | {{ snapshot.get('volume', 'N/A') }} | {{ snapshot.get('amount', 'N/A') }} |
 {% if snapshot.get('price') %}
 
-| 当前价 | 量比 | 换手率 | 行情来源 |
-|-------|------|--------|----------|
+| 현재가 | 거래량비 | 회전율 | 시세 출처 |
+|--------|----------|--------|-----------|
 | {{ snapshot.get('price', 'N/A') }} | {{ snapshot.get('volume_ratio', 'N/A') }} | {{ snapshot.get('turnover_rate', 'N/A') }} | {{ snapshot.get('source', 'N/A') }} |
 {% endif %}
 
