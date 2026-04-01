@@ -1,9 +1,9 @@
-# Shrink Volume Pullback Strategy / 缩量回踩
+# Shrink Volume Pullback Strategy / 거래량 감소 되돌림
 # Volume shrinks during pullback to MA5/MA10, then price bounces.
 
 name: shrink_pullback
-display_name: 缩量回踩
-description: 检测缩量回踩均线支撑信号，趋势延续的理想入场点。
+display_name: 거래량 감소 되돌림
+description: 이동평균선 지지선 되돌림 신호 감지. 추세 연속의 이상적인 진입 포인트입니다.
 category: trend
 core_rules: [1, 2, 4]
 required_tools:
@@ -12,31 +12,31 @@ required_tools:
   - get_realtime_quote
 
 instructions: |
-  **缩量回踩（Shrink Volume Pullback Strategy）**
+  **거래량 감소 되돌림 (Shrink Volume Pullback Strategy)**
 
-  入场判定标准：
+  진입 판정 기준:
 
-  1. **前提条件**（关联理念2：趋势交易）：
-     - 股票必须处于上升趋势（MA5 > MA10 > MA20）。
-     - 使用 `analyze_trend` 确认多头排列。
+  1. **전제 조건** (매매 철학 2: 추세 매매):
+     - 종목이 상승 추세여야 함 (MA5 > MA10 > MA20).
+     - `analyze_trend`으로 정배열 확인.
 
-  2. **回踩检测**（关联理念4：买点偏好）：
-     - 使用 `get_daily_history` 和 `get_realtime_quote`。
-     - 价格回踩至 MA5 附近（误差 1% 以内）或 MA10 附近（误差 2% 以内）。
-     - 回调期间成交量 < 5 日均量的 70%（缩量特征）。
-     - `analyze_trend` → volume_status 应显示缩量。
+  2. **되돌림 감지** (매매 철학 4: 매수 타이밍 선호):
+     - `get_daily_history` 및 `get_realtime_quote` 사용.
+     - 가격이 MA5 부근 (오차 1% 이내) 또는 MA10 부근 (오차 2% 이내)으로 되돌림.
+     - 조정 기간 거래량 < 5일 평균 거래량의 70% (거래량 감소 특징).
+     - `analyze_trend` → volume_status가 거래량 감소를 표시해야 함.
 
-  3. **反弹信号**（关联理念1：严进策略）：
-     - 当前价格守住均线支撑位。
-     - MA5 乖离率 < 2% — 最佳买入区间。
+  3. **반등 신호** (매매 철학 1: 엄격한 진입):
+     - 현재 가격이 이동평균선 지지선을 유지.
+     - MA5 이격률 < 2% — 최적 매수 구간.
 
-  4. **确认条件**（关联理念5：风险排查）：
-     - `search_stock_news` 无利空消息。
-     - 筹码分布健康（获利比例 50-80%）。
+  4. **확인 조건** (매매 철학 5: 리스크 점검):
+     - `search_stock_news` 악재 없음.
+     - 수급 분포 건강 (수익 비율 50-80%).
 
-  评分调整：
-  - 缩量回踩 MA5：sentiment_score +10
-  - 缩量回踩 MA10 且量能 < 0.6 倍均量：sentiment_score +8
-  - 理想买点设在 MA5 水平，次优买点设在 MA10。
-  - 止损设在 MA20 水平。
-  - 在 `buy_reason` 中注明"缩量回踩"。
+  평가 점수 조정:
+  - 거래량 감소 MA5 되돌림: sentiment_score +10
+  - 거래량 감소 MA10 되돌림이고 거래량 < 0.6배 평균: sentiment_score +8
+  - 이상적 매수 포인트는 MA5 수준, 차선은 MA10.
+  - 손절선은 MA20 수준.
+  - `buy_reason`에 "거래량 감소 되돌림" 명시.
