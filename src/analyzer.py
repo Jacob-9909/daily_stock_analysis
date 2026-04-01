@@ -1231,26 +1231,40 @@ class GeminiAnalyzer:
         return prompt
     
     def _format_volume(self, volume: Optional[float]) -> str:
-        """格式化成交量显示"""
+        """거래량(주) 표시 포맷"""
         if volume is None:
             return 'N/A'
-        if volume >= 1e8:
-            return f"{volume / 1e8:.2f} 亿股"
-        elif volume >= 1e4:
-            return f"{volume / 1e4:.2f} 万股"
-        else:
-            return f"{volume:.0f} 股"
+        try:
+            v = float(volume)
+        except (TypeError, ValueError):
+            return 'N/A'
+
+        if abs(v) >= 1e9:
+            return f"{v / 1e9:.2f}B주"
+        if abs(v) >= 1e6:
+            return f"{v / 1e6:.2f}M주"
+        if abs(v) >= 1e3:
+            return f"{v / 1e3:.2f}K주"
+        return f"{v:.0f}주"
     
     def _format_amount(self, amount: Optional[float]) -> str:
-        """格式化成交额显示"""
+        """거래대금 표시 포맷(통화 기호 없이 축약)"""
         if amount is None:
             return 'N/A'
-        if amount >= 1e8:
-            return f"{amount / 1e8:.2f} 亿元"
-        elif amount >= 1e4:
-            return f"{amount / 1e4:.2f} 万元"
-        else:
-            return f"{amount:.0f} 元"
+        try:
+            a = float(amount)
+        except (TypeError, ValueError):
+            return 'N/A'
+
+        if abs(a) >= 1e12:
+            return f"{a / 1e12:.2f}T"
+        if abs(a) >= 1e9:
+            return f"{a / 1e9:.2f}B"
+        if abs(a) >= 1e6:
+            return f"{a / 1e6:.2f}M"
+        if abs(a) >= 1e3:
+            return f"{a / 1e3:.2f}K"
+        return f"{a:.0f}"
 
     def _format_percent(self, value: Optional[float]) -> str:
         """格式化百分比显示"""

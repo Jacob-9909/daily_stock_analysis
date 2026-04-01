@@ -65,21 +65,21 @@ class ChannelDetector:
     
     @staticmethod
     def get_channel_name(channel: NotificationChannel) -> str:
-        """获取渠道中文名称"""
+        """채널 표시 이름(로그/상태 출력용)"""
         names = {
-            NotificationChannel.WECHAT: "企业微信",
-            NotificationChannel.FEISHU: "飞书",
+            NotificationChannel.WECHAT: "위챗 워크(기업 위챗)",
+            NotificationChannel.FEISHU: "페이수(Feishu)",
             NotificationChannel.TELEGRAM: "Telegram",
-            NotificationChannel.EMAIL: "邮件",
+            NotificationChannel.EMAIL: "이메일",
             NotificationChannel.PUSHOVER: "Pushover",
             NotificationChannel.PUSHPLUS: "PushPlus",
             NotificationChannel.SERVERCHAN3: "Server酱3",
-            NotificationChannel.CUSTOM: "自定义Webhook",
-            NotificationChannel.DISCORD: "Discord机器人",
-            NotificationChannel.ASTRBOT: "ASTRBOT机器人",
-            NotificationChannel.UNKNOWN: "未知渠道",
+            NotificationChannel.CUSTOM: "커스텀 Webhook",
+            NotificationChannel.DISCORD: "Discord 봇",
+            NotificationChannel.ASTRBOT: "AstrBot",
+            NotificationChannel.UNKNOWN: "알 수 없음",
         }
-        return names.get(channel, "未知渠道")
+        return names.get(channel, "알 수 없음")
 
 
 class NotificationService(
@@ -538,8 +538,9 @@ class NotificationService(
             report_lines.extend(["## 📊 분석 결과 요약", ""])
             for r in sorted_results:
                 emoji = r.get_emoji()
+                signal_text, _, _ = self._get_signal_level(r)
                 report_lines.append(
-                    f"{emoji} **{r.name}({r.code})**: {r.operation_advice} | "
+                    f"{emoji} **{r.name}({r.code})**: {signal_text} | "
                     f"점수 {r.sentiment_score} | {r.trend_prediction}"
                 )
         else:
@@ -548,11 +549,12 @@ class NotificationService(
             for result in sorted_results:
                 emoji = result.get_emoji()
                 confidence_stars = result.get_confidence_stars() if hasattr(result, 'get_confidence_stars') else '⭐⭐'
+                signal_text, _, _ = self._get_signal_level(result)
                 
                 report_lines.extend([
                     f"### {emoji} {result.name} ({result.code})",
                     "",
-                    f"**操作建议：{result.operation_advice}** | **综合评分：{result.sentiment_score}分** | **趋势预测：{result.trend_prediction}** | **置信度：{confidence_stars}**",
+                    f"**조작 권고: {signal_text}** | **종합 점수: {result.sentiment_score}점** | **추세 예측: {result.trend_prediction}** | **신뢰도: {confidence_stars}**",
                     "",
                 ])
 
@@ -583,9 +585,9 @@ class NotificationService(
                 # 短期/中期展望
                 outlook_lines = []
                 if hasattr(result, 'short_term_outlook') and result.short_term_outlook:
-                    outlook_lines.append(f"- **短期（1-3日）**：{result.short_term_outlook}")
+                    outlook_lines.append(f"- **단기(1~3일)**: {result.short_term_outlook}")
                 if hasattr(result, 'medium_term_outlook') and result.medium_term_outlook:
-                    outlook_lines.append(f"- **中期（1-2周）**：{result.medium_term_outlook}")
+                    outlook_lines.append(f"- **중기(1~2주)**: {result.medium_term_outlook}")
                 if outlook_lines:
                     report_lines.extend([
                         "#### 🔮 市场展望",
@@ -677,7 +679,7 @@ class NotificationService(
         # 底部信息（去除免责声明）
         report_lines.extend([
             "",
-            f"*报告生成时间：{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*",
+            f"*보고서 생성 시각: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*",
         ])
         
         return "\n".join(report_lines)
@@ -804,11 +806,11 @@ class NotificationService(
                 "",
             ])
             for r in sorted_results:
-                _, signal_emoji, _ = self._get_signal_level(r)
+                signal_text, signal_emoji, _ = self._get_signal_level(r)
                 display_name = self._escape_md(r.name)
                 report_lines.append(
-                    f"{signal_emoji} **{display_name}({r.code})**: {r.operation_advice} | "
-                    f"评分 {r.sentiment_score} | {r.trend_prediction}"
+                    f"{signal_emoji} **{display_name}({r.code})**: {signal_text} | "
+                    f"점수 {r.sentiment_score} | {r.trend_prediction}"
                 )
             report_lines.extend([
                 "",
@@ -1056,11 +1058,11 @@ class NotificationService(
             lines.append("**📊 분석 결과 요약**")
             lines.append("")
             for r in sorted_results:
-                _, signal_emoji, _ = self._get_signal_level(r)
+                signal_text, signal_emoji, _ = self._get_signal_level(r)
                 stock_name = self._escape_md(r.name if r.name and not r.name.startswith('股票') else f'股票{r.code}')
                 lines.append(
-                    f"{signal_emoji} **{stock_name}({r.code})**: {r.operation_advice} | "
-                    f"评分 {r.sentiment_score} | {r.trend_prediction}"
+                    f"{signal_emoji} **{stock_name}({r.code})**: {signal_text} | "
+                    f"점수 {r.sentiment_score} | {r.trend_prediction}"
                 )
         else:
             for result in sorted_results:
@@ -1123,11 +1125,11 @@ class NotificationService(
                     take_profit = str(sniper.get('take_profit', ''))
                     points = []
                     if ideal_buy:
-                        points.append(f"🎯买点:{ideal_buy[:15]}")
+                        points.append(f"🎯매수가:{ideal_buy[:15]}")
                     if stop_loss:
-                        points.append(f"🛑止损:{stop_loss[:15]}")
+                        points.append(f"🛑손절:{stop_loss[:15]}")
                     if take_profit:
-                        points.append(f"🎊目标:{take_profit[:15]}")
+                        points.append(f"🎊목표:{take_profit[:15]}")
                     if points:
                         lines.append(" | ".join(points))
                         lines.append("")
@@ -1155,10 +1157,10 @@ class NotificationService(
                 lines.append("")
         
         # 底部
-        lines.append(f"*生成时间: {datetime.now().strftime('%H:%M')}*")
+        lines.append(f"*생성 시각: {datetime.now().strftime('%H:%M')}*")
         models = self._collect_models_used(results)
         if models:
-            lines.append(f"*分析模型: {', '.join(models)}*")
+            lines.append(f"*분석 모델: {', '.join(models)}*")
 
         content = "\n".join(lines)
         
@@ -1186,7 +1188,7 @@ class NotificationService(
         avg_score = sum(r.sentiment_score for r in results) / len(results) if results else 0
 
         lines = [
-            f"## 📅 {report_date} 股票分析报告",
+            f"## 📅 {report_date} 종목 분석 보고서",
             "",
             f"> 총 **{len(results)}** 종목 | 🟢매수:{buy_count} 🟡관망:{hold_count} 🔴매도:{sell_count} | 평균:{avg_score:.0f}",
             "",
@@ -1195,10 +1197,11 @@ class NotificationService(
         # 每只股票精简信息（控制长度）
         for result in sorted_results:
             emoji = result.get_emoji()
+            signal_text, _, _ = self._get_signal_level(result)
             
             # 核心信息行
             lines.append(f"### {emoji} {result.name}({result.code})")
-            lines.append(f"**{result.operation_advice}** | 评分:{result.sentiment_score} | {result.trend_prediction}")
+            lines.append(f"**{signal_text}** | 점수:{result.sentiment_score} | {result.trend_prediction}")
             
             # 操作理由（截断）
             if hasattr(result, 'buy_reason') and result.buy_reason:
@@ -1261,13 +1264,13 @@ class NotificationService(
                 return out
         # Fallback: brief summary from dashboard report
         if not results:
-            return f"# {report_date} 决策简报\n\n无分析结果"
+            return f"# {report_date} 의사결정 브리핑\n\n분석 결과가 없습니다."
         sorted_results = sorted(results, key=lambda x: x.sentiment_score, reverse=True)
         buy_count = sum(1 for r in results if getattr(r, 'decision_type', '') == 'buy')
         sell_count = sum(1 for r in results if getattr(r, 'decision_type', '') == 'sell')
         hold_count = sum(1 for r in results if getattr(r, 'decision_type', '') in ('hold', ''))
         lines = [
-            f"# {report_date} 决策简报",
+            f"# {report_date} 의사결정 브리핑",
             "",
             f"> {len(results)}종목 | 🟢{buy_count} 🟡{hold_count} 🔴{sell_count}",
             "",
@@ -1278,7 +1281,8 @@ class NotificationService(
             dash = r.dashboard or {}
             core = dash.get('core_conclusion', {}) or {}
             one = (core.get('one_sentence') or r.analysis_summary or '')[:60]
-            lines.append(f"**{self._escape_md(name)}({r.code})** {emoji} {r.operation_advice} | 评分{r.sentiment_score} | {one}")
+            signal_text, _, _ = self._get_signal_level(r)
+            lines.append(f"**{self._escape_md(name)}({r.code})** {emoji} {signal_text} | 점수 {r.sentiment_score} | {one}")
         lines.append("")
         lines.append(f"*{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*")
         return "\n".join(lines)
@@ -1658,11 +1662,22 @@ class NotificationBuilder:
         
         适用于快速通知
         """
-        lines = ["📊 **今日自选股摘要**", ""]
+        lines = ["📊 **오늘의 관심종목 요약**", ""]
         
         for r in sorted(results, key=lambda x: x.sentiment_score, reverse=True):
             emoji = r.get_emoji()
-            lines.append(f"{emoji} {r.name}({r.code}): {r.operation_advice} | 评分 {r.sentiment_score}")
+            advice = getattr(r, "operation_advice", "") or ""
+            advice_ko = {
+                "强烈买入": "강력 매수",
+                "买入": "매수",
+                "加仓": "매수",
+                "持有": "관망",
+                "观望": "관망",
+                "减仓": "감산",
+                "卖出": "매도",
+                "强烈卖出": "매도",
+            }.get(advice, advice)
+            lines.append(f"{emoji} {r.name}({r.code}): {advice_ko} | 점수 {r.sentiment_score}")
         
         return "\n".join(lines)
 
